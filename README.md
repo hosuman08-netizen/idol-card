@@ -4,3 +4,6 @@
 - Pitch: AI 아이돌 카드 수집 가챠(확률 고지·픽션).
 - Format: web mini-app / TG-ready
 - Guards: age gate mandatory · no minors · platform ToS · fictional where noted
+
+## LEARNED 2026-07-21 parallel
+- PWA sw shell · always-learning stamp · fleet parallel wave
