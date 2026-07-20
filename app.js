@@ -45,9 +45,9 @@
     var sc=st.count||0;
     var ready=!st.shieldLast||((new Date(dayKey(0))-new Date(st.shieldLast))/86400000)>=7;
     root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional entertainment · 실관계/결제 아님</div>'
-      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 뽑기 '+pulls+' · soft pity '+pity+'/30<br><span class="sub">확률 예시 N50 R35 SR12 SSR3 · 천장 보장 없음 · 가상</span>'
+      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 뽑기 '+pulls+' · soft pity '+pity+'/30<br><span class="sub">확률 고지 N50 R35 SR12 SSR3 · soft pity 30=SSR 1회 보정(세트강제 아님) · 가상</span>'
       +'<div style="margin-top:6px"><span class="chip">🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')+'</span> <span class="chip">창 '+fomoLeft()+'</span></div>'
-      +'<div class="sub" style="margin-top:8px">확률 고지: N 50% · R 35% · SR 12% · SSR 3% (가상)</div>'
+      +'<div class="sub" style="margin-top:8px">확률 고지: N 50% · R 35% · SR 12% · SSR 3% · soft pity 30회 SSR 보정(컴프 아님) · 가상</div>'
       +'<div class="row" style="margin-top:10px"><button id="use">1 사용 · 체험</button><button class="sec" id="get">무료 +3 (쿨다운 로컬)</button></div>'
       +'<div id="log" class="sub" style="margin-top:10px">'+(lastRar?'마지막: '+lastRar:'첫 카드를 뽑아보세요')+' · bag N'+(bag.N||0)+' R'+(bag.R||0)+' SR'+(bag.SR||0)+' SSR'+(bag.SSR||0)+'</div>'
       +'<div id="sharePeak" style="display:none;margin-top:12px;padding:10px;border:1px solid #f472b644;border-radius:12px">'
@@ -62,11 +62,11 @@
     document.getElementById('use').onclick=function(){
       if(credits<=0){document.getElementById('log').textContent='크레딧 없음 · 무료 충전 또는 후원 문의';try{legionTrack('money_pipe_shown',{app:'idol',empty:1})}catch(e){}return;}
       credits--;save();
-      pulls++; localStorage.setItem('idol_pulls',pulls); var roll=Math.random(); if(pity>=30){roll=0;} var rar=roll<0.03+(pity*0.001)? 'SSR': roll<0.15? 'SR': roll<0.4? 'R':'N'; if(rar==='SSR'){pity=0;} else {pity++;} localStorage.setItem('idol_pity',pity); bag[rar]=(bag[rar]||0)+1; localStorage.setItem('idol_bag',JSON.stringify(bag));
+      pulls++; localStorage.setItem('idol_pulls',pulls); var roll=Math.random(); var ssrP=0.03+Math.min(0.02,pity*0.0005); if(pity>=30){rar='SSR';} else if(roll<ssrP){rar='SSR';} else if(roll<ssrP+0.12){rar='SR';} else if(roll<ssrP+0.12+0.35){rar='R';} else {rar='N';} if(rar==='SSR'){pity=0;} else {pity++;} localStorage.setItem('idol_pity',pity); bag[rar]=(bag[rar]||0)+1; localStorage.setItem('idol_bag',JSON.stringify(bag));
       lastRar=rar;
       bumpStreak();
       render();
-      document.getElementById('log').textContent='카드 '+rar+' · '+new Date().toLocaleTimeString()+' · 확률 N50 R35 SR12 SSR3';
+      document.getElementById('log').textContent='카드 '+rar+' · '+new Date().toLocaleTimeString()+' · 확률 N50/R35/SR12/SSR3 · soft pity '+pity+'/30';
       var peak=document.getElementById('sharePeak'); if(peak) peak.style.display='block';
       try{legionTrack('activate',{credits:credits,rar:rar})}catch(e){}
       try{legionTrack('share_peak_shown',{rar:rar})}catch(e){}
