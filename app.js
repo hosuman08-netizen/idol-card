@@ -47,7 +47,7 @@
     root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional entertainment · 실관계/결제 아님</div>'
       +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 뽑기 '+pulls+' · soft pity '+pity+'/30<br><span class="sub">확률 고지 N50 R35 SR12 SSR3 · soft pity 30=SSR 1회 보정(세트강제 아님) · 가상</span>'
       +'<div style="margin-top:6px"><span class="chip">🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')+'</span> <span class="chip">창 '+fomoLeft()+'</span></div>'
-      +'<div class="sub" style="margin-top:8px">확률 고지: N 50% · R 35% · SR 12% · SSR 3% · soft pity 30회 SSR 보정(컴프 아님) · 가상</div>'
+      +'<div class="sub" style="margin-top:8px">확률 고지: N 50% · R 35% · SR 12% · SSR 3% · soft pity 30회 SSR 보정(컴프 아님) · 코드=고지 정합 · 가상</div>'
       +'<div class="row" style="margin-top:10px"><button id="use">1 사용 · 체험</button><button class="sec" id="get">무료 +3 (쿨다운 로컬)</button></div>'
       +'<div id="log" class="sub" style="margin-top:10px">'+(lastRar?'마지막: '+lastRar:'첫 카드를 뽑아보세요')+' · bag N'+(bag.N||0)+' R'+(bag.R||0)+' SR'+(bag.SR||0)+' SSR'+(bag.SSR||0)+'</div>'
       +'<div id="sharePeak" style="display:none;margin-top:12px;padding:10px;border:1px solid #f472b644;border-radius:12px">'
