@@ -1,4 +1,7 @@
 
+
+/* LEGION_WAVE_31_session_counter */
+try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorage.setItem('lw_p37_idol_car_session_counter','1');localStorage.setItem('lw_p37_idol_car_session_counter',String((+(localStorage.getItem('lw_p37_idol_car_session_counter')||0))+1));}}catch(e){}
 (function(){
   var credits=+(localStorage.getItem('idol-card_cr')||10); var pulls=+(localStorage.getItem('idol_pulls')||0); var pity=+(localStorage.getItem('idol_pity')||0); var bag=JSON.parse(localStorage.getItem('idol_bag')||'{}'); var bestSSR=+(localStorage.getItem('idol_best_ssr')||0); var shareN=+(localStorage.getItem('idol_share_n')||0);
   var root=document.getElementById('app');
