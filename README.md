@@ -1,9 +1,5 @@
-# p37-idol-card — Synthetic Idol Card
-**Wave A · 성인 빠른 돈 · 18+ only**
-- Money: 크레딧 가챠
-- Pitch: AI 아이돌 카드 수집 가챠(확률 고지·픽션).
-- Format: web mini-app / TG-ready
-- Guards: age gate mandatory · no minors · platform ToS · fictional where noted
+# Idol Card
 
-## LEARNED 2026-07-21 parallel
-- PWA sw shell · always-learning stamp · fleet parallel wave
+LIVE: https://hosuman08-netizen.github.io/idol-card/
+
+BUILT real loop 2026-07-21 parallel — not scaffold.
