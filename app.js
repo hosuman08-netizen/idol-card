@@ -132,3 +132,5 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
   try{legionTrack('session_start',{app:'idol-card'})}catch(e){}
   render();
 })();
+
+/* LEGION_WAVE_76_wave_stamp */ /* ship wave 76 2026-07-21T07:43:52 */
