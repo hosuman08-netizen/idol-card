@@ -1,6 +1,6 @@
 
 (function(){
-  var credits=+(localStorage.getItem('idol-card_cr')||10);
+  var credits=+(localStorage.getItem('idol-card_cr')||10); var pulls=+(localStorage.getItem('idol_pulls')||0);
   var root=document.getElementById('app');
   var SHARE_BASE='https://hosuman08-netizen.github.io/idol-card/';
   var lastRar='';
@@ -45,7 +45,7 @@
     var sc=st.count||0;
     var ready=!st.shieldLast||((new Date(dayKey(0))-new Date(st.shieldLast))/86400000)>=7;
     root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional entertainment · 실관계/결제 아님</div>'
-      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> (가상)'
+      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 뽑기 '+pulls+' (가상)'
       +'<div style="margin-top:6px"><span class="chip">🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')+'</span> <span class="chip">창 '+fomoLeft()+'</span></div>'
       +'<div class="sub" style="margin-top:8px">확률 고지: N 50% · R 35% · SR 12% · SSR 3% (가상)</div>'
       +'<div class="row" style="margin-top:10px"><button id="use">1 사용 · 체험</button><button class="sec" id="get">무료 +3 (쿨다운 로컬)</button></div>'
@@ -62,7 +62,7 @@
     document.getElementById('use').onclick=function(){
       if(credits<=0){document.getElementById('log').textContent='크레딧 없음 · 무료 충전 또는 후원 문의';try{legionTrack('money_pipe_shown',{app:'idol',empty:1})}catch(e){}return;}
       credits--;save();
-      var rar=['N','R','SR','SSR'][Math.random()<0.05?3:Math.random()<0.15?2:Math.random()<0.4?1:0];
+      pulls++; localStorage.setItem('idol_pulls',pulls); var rar=['N','R','SR','SSR'][Math.random()<0.05?3:Math.random()<0.15?2:Math.random()<0.4?1:0];
       lastRar=rar;
       bumpStreak();
       render();
