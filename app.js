@@ -1,6 +1,6 @@
 
 (function(){
-  var credits=+(localStorage.getItem('idol-card_cr')||10); var pulls=+(localStorage.getItem('idol_pulls')||0); var pity=+(localStorage.getItem('idol_pity')||0); var bag=JSON.parse(localStorage.getItem('idol_bag')||'{}'); var bestSSR=+(localStorage.getItem('idol_best_ssr')||0);
+  var credits=+(localStorage.getItem('idol-card_cr')||10); var pulls=+(localStorage.getItem('idol_pulls')||0); var pity=+(localStorage.getItem('idol_pity')||0); var bag=JSON.parse(localStorage.getItem('idol_bag')||'{}'); var bestSSR=+(localStorage.getItem('idol_best_ssr')||0); var shareN=+(localStorage.getItem('idol_share_n')||0);
   var root=document.getElementById('app');
   var SHARE_BASE='https://hosuman08-netizen.github.io/idol-card/';
   var lastRar='';
@@ -76,7 +76,7 @@
     var ready=!st.shieldLast||((new Date(dayKey(0))-new Date(st.shieldLast))/86400000)>=7;
     var br=bestRar();
     root.innerHTML='<div class="card" style="border-color:#f472b6"><b>18+</b> Fictional entertainment · 실관계/결제 아님</div>'
-      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 뽑기 '+pulls+' · soft pity '+pity+'/30 · SSR누적 '+bestSSR+'<br><span class="sub">확률 고지 N50 R35 SR12 SSR3 · soft pity 30=SSR 1회 보정(세트강제 아님) · 가상</span>'
+      +'<div class="card">크레딧 <b style="color:var(--gold)">'+credits+'</b> · 뽑기 '+pulls+' · soft pity '+pity+'/30 · SSR '+bestSSR+' · 공유 '+shareN+'<br><span class="sub">확률 고지 N50 R35 SR12 SSR3 · soft pity 30=SSR 1회 보정(세트강제 아님) · 가상</span>'
       +'<div style="margin-top:6px"><span class="chip">🔥 '+sc+'일'+(sc>=3&&ready?' · 🛡️':'')+'</span> <span class="chip">오늘 '+todayPulls()+'회</span> <span class="chip">창 '+fomoLeft()+'</span>'
       +(br?' <span class="chip">최고 '+br+'</span>':'')+' <span class="chip">7일 SSR '+weekSSR()+'</span></div>'
       +'<div class="sub" style="margin-top:8px">확률 고지: N 50% · R 35% · SR 12% · SSR 3% · soft pity 30회 SSR 보정(컴프 아님) · 코드=고지 정합 · 가상</div>'
@@ -115,7 +115,7 @@
       var text='Idol Card '+lastRar+' (fictional 18+) · rates N50/R35/SR12/SSR3\n'+shareUrl();
       if(navigator.share) navigator.share({text:text,url:shareUrl()}).catch(function(){});
       else if(navigator.clipboard) navigator.clipboard.writeText(text);
-      try{legionTrack('share_peak',{rar:lastRar})}catch(e){}
+      try{shareN++;localStorage.setItem('idol_share_n',shareN);}catch(e){} try{legionTrack('share_peak',{rar:lastRar})}catch(e){}
     };
   }
   try{
