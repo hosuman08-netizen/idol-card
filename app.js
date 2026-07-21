@@ -84,7 +84,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       +(br?' <span class="chip">최고 '+br+'</span>':'')+' <span class="chip">7일 SSR '+weekSSR()+'</span></div>'
       +'<div class="sub" style="margin-top:8px">확률 고지: N 50% · R 35% · SR 12% · SSR 3% · soft pity 30회 SSR 보정(컴프 아님) · 코드=고지 정합 · 가상</div>'
       +'<div style="height:8px;background:#1c1826;border-radius:4px;margin-top:8px;overflow:hidden" title="soft pity '+pity+'/30"><i style="display:block;height:100%;width:'+Math.min(100,Math.round(pity/30*100))+'%;background:linear-gradient(90deg,#c4b5fd,#fbbf24)"></i></div>'
-      +bagBar()
+      +bagBar()+"<button class='sec' id='bagClear' style='margin-top:8px;width:100%'>가방 초기화(체험)</button>"
       +'<div class="row" style="margin-top:10px"><button id="use">1 사용</button><button class="sec" id="use10">10연 (×10)</button><button class="sec" id="get">무료 +3</button></div>'
       +'<div id="log" class="sub" style="margin-top:10px">'+(lastRar?'마지막: '+lastRar:'첫 카드를 뽑아보세요')+' · bag N'+(bag.N||0)+' R'+(bag.R||0)+' SR'+(bag.SR||0)+' SSR'+(bag.SSR||0)+'</div>'
       +'<div id="sharePeak" style="display:none;margin-top:12px;padding:10px;border:1px solid #f472b644;border-radius:12px">'
@@ -128,6 +128,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       try{legionTrack('activate',{multi:10,got:got})}catch(e){}
       try{legionTrack('share_peak_shown',{multi:10})}catch(e){}
     };
+    var bc=document.getElementById('bagClear'); if(bc) bc.onclick=function(){ if(!confirm('가방 비울까?'))return; bag={}; localStorage.setItem('idol_bag','{}'); render(); try{legionTrack('bag_clear',{})}catch(e){} };
     document.getElementById('get').onclick=function(){
       var k='idol-card_cd_'+new Date().toDateString();
       if(localStorage.getItem(k)){document.getElementById('log').textContent='오늘 무료 충전 완료';return;}
