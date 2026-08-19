@@ -236,6 +236,58 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     if(btn.setAttribute) btn.setAttribute('data-focus-after-hide','1');
     return true;
   }
+  /* WAVE207: 포커스 링 재탭=재시작 분리 · 숨김과 분리 · 컴프 0 · 확률 불변 */
+  var histCsvRingTok=0;
+  function histCsvFocusRingMs(){ return 400; }
+  function histCsvFocusRingOn(el){
+    el=el||(typeof document!=='undefined'?document.getElementById('histCsv'):null);
+    if(!el) return false;
+    if(el._ringT) return true;
+    if(el.getAttribute&&el.getAttribute('data-focus-ring')==='1') return true;
+    return false;
+  }
+  function clearHistCsvFocusRing(){
+    var el=typeof document!=='undefined'?document.getElementById('histCsv'):null;
+    if(!el) return;
+    el.style.outline='';
+    el.style.outlineOffset='';
+    el.style.boxShadow='';
+    if(el.setAttribute){
+      el.setAttribute('data-focus-ring','0');
+      el.setAttribute('data-re-ring','0');
+    }
+    el._ringT=0;
+  }
+  function armHistCsvFocusRing(){
+    var el=typeof document!=='undefined'?document.getElementById('histCsv'):null;
+    if(!el) return false;
+    var retr=histCsvFocusRingOn(el);
+    el.style.outline='2px solid #67e8f9';
+    el.style.outlineOffset='2px';
+    el.style.boxShadow='0 0 0 4px #67e8f955';
+    if(el.setAttribute){
+      el.setAttribute('data-focus-ring','1');
+      el.setAttribute('data-re-ring', retr?'1':'0');
+      el.setAttribute('data-ring-off','0');
+    }
+    if(el._ringT) try{clearTimeout(el._ringT);}catch(e0){}
+    var tok=++histCsvRingTok;
+    el._ringT=setTimeout(function(){
+      if(tok!==histCsvRingTok) return;
+      clearHistCsvFocusRing();
+    }, histCsvFocusRingMs());
+    return true;
+  }
+  function restartHistCsvRingFromFocus(){
+    var el=typeof document!=='undefined'?document.getElementById('histCsv'):null;
+    if(!el||!el.getAttribute||el.getAttribute('data-focus-after-hide')!=='1') return false;
+    armHistCsvFocusRing();
+    if(el.setAttribute){
+      el.setAttribute('data-re-ring','1');
+      el.setAttribute('data-re-from-focus','1');
+    }
+    return true;
+  }
   /* WAVE157: 확인줄 탭=즉시숨김 · 컴프 0 · 확률 불변 */
   function bindHistCsvCopyOkTap(){
     var el=typeof document!=='undefined'?document.getElementById('histCsvCopyOk'):null;
@@ -366,6 +418,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     var csvBtn=document.getElementById('histCsv');
     if(csvBtn) csvBtn.onclick=function(ev){
       if(ev && ev.stopPropagation) ev.stopPropagation();
+      if(restartHistCsvRingFromFocus()) return;
       var csv=downloadStageHistCsv();
       var n=(loadStageHist()||[]).length;
       var out=document.getElementById('stageOut');
