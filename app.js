@@ -223,7 +223,31 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     if(!el) return false;
     el.textContent='';
     el.setAttribute('data-ok','0');
+    el.setAttribute('data-hidden','1');
     el.setAttribute('hidden','');
+    return true;
+  }
+  /* WAVE157: 확인줄 탭=즉시숨김 · 컴프 0 · 확률 불변 */
+  function bindHistCsvCopyOkTap(){
+    var el=typeof document!=='undefined'?document.getElementById('histCsvCopyOk'):null;
+    if(!el) return false;
+    el.setAttribute('role','button');
+    el.tabIndex=0;
+    el.style.cursor='pointer';
+    el.setAttribute('data-tap-hide','1');
+    el.title='탭=확인줄 즉시숨김 · 컴프 0 · 확률 불변';
+    el.onclick=function(ev){
+      if(ev && ev.stopPropagation) ev.stopPropagation();
+      if(!el.textContent) return;
+      if(histCsvCopyOkHideTimer){ try{clearTimeout(histCsvCopyOkHideTimer);}catch(e0){} histCsvCopyOkHideTimer=null; }
+      hideHistCsvCopyOk();
+    };
+    el.onkeydown=function(ev){
+      var k=ev&&ev.key;
+      if(k!=='Enter' && k!==' ') return;
+      if(ev.preventDefault) ev.preventDefault();
+      el.onclick(ev);
+    };
     return true;
   }
   function armHistCsvCopyOkHide(){
@@ -238,9 +262,12 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     el.setAttribute('data-ok', copied?'1':'0');
     if(line){
       el.removeAttribute('hidden');
+      el.setAttribute('data-hidden','0');
       armHistCsvCopyOkHide();
+      try{bindHistCsvCopyOkTap();}catch(eB){}
     }else{
       el.setAttribute('hidden','');
+      el.setAttribute('data-hidden','1');
       if(histCsvCopyOkHideTimer){ clearTimeout(histCsvCopyOkHideTimer); histCsvCopyOkHideTimer=null; }
     }
     return line;
@@ -289,7 +316,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     var csvBtn=' <button type="button" class="sec" id="histCsv" style="padding:2px 8px;font-size:11px;margin-left:4px" title="'+stageHistCsvName()+'">'+stageHistCsvBtnLabel()+'</button>'
       +' <button type="button" class="sec" id="histCsvCopy" style="padding:2px 8px;font-size:11px;margin-left:4px" title="'+stageHistCsvName()+'">'+stageHistCsvCopyLabel()+'</button>'
       +' <span id="histCsvCopyN" class="chip" role="button" tabindex="0" style="margin-left:4px;cursor:pointer" title="CSV 복사 · '+stageHistCsvNChip(stageHistCsvRowN(stageHistCsv()))+'" data-n="'+stageHistCsvRowN(stageHistCsv())+'" data-copied="0">'+stageHistCsvNChip(stageHistCsvRowN(stageHistCsv()))+'</span>'
-      +' <span id="histCsvCopyOk" class="sub" hidden data-ok="0" style="margin-left:4px"></span>';
+      +' <span id="histCsvCopyOk" class="sub" hidden data-ok="0" data-tap-hide="1" role="button" tabindex="0" style="margin-left:4px;cursor:pointer" title="탭=확인줄 즉시숨김 · 컴프 0"></span>';
     if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7'+csvBtn+'</p>';
     return '<div id="stageHist" class="sub" style="margin:8px 0 0">기록 '
       +h.map(function(x,i){
@@ -342,6 +369,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       if(ev && ev.stopPropagation) ev.stopPropagation();
       return applyStageHistCsvCopy('btn');
     };
+    try{bindHistCsvCopyOkTap();}catch(eOk){}
     var nChip=document.getElementById('histCsvCopyN');
     if(nChip){
       nChip.onclick=function(ev){
