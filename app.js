@@ -177,6 +177,9 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
   function stageHistCsvName(day){
     return 'idol-stage-hist-'+(day||dayKey(0))+'.csv';
   }
+  function stageHistCsvBtnLabel(day){
+    return 'CSV · '+stageHistCsvName(day);
+  }
   function downloadStageHistCsv(){
     var csv=stageHistCsv();
     var name=stageHistCsvName();
@@ -198,7 +201,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
   }
   function stageHistLine(){
     var h=loadStageHist();
-    var csvBtn=' <button type="button" class="sec" id="histCsv" style="padding:2px 8px;font-size:11px;margin-left:4px">CSV '+dayKey(0)+'</button>';
+    var csvBtn=' <button type="button" class="sec" id="histCsv" style="padding:2px 8px;font-size:11px;margin-left:4px" title="'+stageHistCsvName()+'">'+stageHistCsvBtnLabel()+'</button>';
     if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7'+csvBtn+'</p>';
     return '<div id="stageHist" class="sub" style="margin:8px 0 0">기록 '
       +h.map(function(x,i){
