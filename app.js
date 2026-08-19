@@ -8,6 +8,8 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
   var SHARE_BASE='https://hosuman08-netizen.github.io/idol-card/';
   var lastRar='';
   var lastCard=null;
+  var leadId='';
+  try{ leadId=localStorage.getItem('idol_lead')||''; }catch(e){ leadId=''; }
   /* GOLD50 TOP1: SuperStar/Enstars — named card identity. Fictional 12. 실아이돌 IP 0. 컴프/세트완성 보상 0 */
   var ROSTER=[
     {id:'n1',rar:'N',name:'린',e:'🌙'},
@@ -115,10 +117,10 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
   }
   /* GOLD50 TOP3: K-Collect/PokéCardex 보유 격자. 컴프/세트완성 보상 0. "전부 모아" 카피 0 */
   function rosterBoard(){
-    return '<p class="sub" style="margin-top:10px">보유 보드 · 세트완성 보상 없음 · 컴프 아님</p>'
+    return '<p class="sub" style="margin-top:10px">보유 보드 · 세트완성 보상 없음 · 컴프 아님 · 보유 칸 탭=주연</p>'
       +'<div class="col-grid">'+ROSTER.map(function(c){
         var n=owned[c.id]||0;
-        return '<div class="col-cell '+(n?'have':'mute')+'"><div class="e">'+c.e+'</div><div class="n">'+c.name+'</div><div class="sub" style="margin:2px 0 0">'+c.rar+(n?' · '+n:'')+'</div></div>';
+        return '<div class="col-cell '+(n?'have':'mute')+(leadId===c.id&&n?' lead':'')+'"'+(n?' data-pick="'+c.id+'"':'')+'><div class="e">'+c.e+'</div><div class="n">'+c.name+'</div><div class="sub" style="margin:2px 0 0">'+c.rar+(n?' · '+n:'')+(leadId===c.id&&n?' · 주연':'')+'</div></div>';
       }).join('')+'</div>';
   }
   /* GOLD50 TOP4: SuperStar/Enstars 무대 1턴. 난수 아님 · 보유 티어 가산만 · 세트완성 보너스 0 */
@@ -132,6 +134,11 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     return 10 + b.N*1 + b.R*5 + b.SR*20 + b.SSR*50;
   }
   function stageLead(){
+    if(leadId){
+      var chosen=null;
+      ROSTER.forEach(function(c){ if(c.id===leadId) chosen=c; });
+      if(chosen && (owned[chosen.id]||0)>0) return chosen;
+    }
     var rank={N:1,R:2,SR:3,SSR:4};
     var best=null, bestN=0;
     ROSTER.forEach(function(c){
@@ -158,8 +165,8 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       +'<div class="sub" style="margin-top:8px">픽션 로스터 12 · 세트완성 보상 없음 · 실아이돌 IP 0</div>'
       +rosterBoard()
       +'<div class="card" id="stageCard" style="margin-top:10px">'
-      +'<p class="sub" style="margin:0 0 6px">무대 1턴 · 난수 아님 · 보유 티어 가산만 · 세트완성 보너스 0</p>'
-      +'<p class="sub" style="margin:0 0 8px">공식 10 + N×1 + R×5 + SR×20 + SSR×50 · 확률 N50/R35/SR12/SSR3 불변</p>'
+      +'<p class="sub" style="margin:0 0 6px">무대 1턴 · 난수 아님 · 보유 티어 가산만 · 세트완성 보너스 0 · 주연은 보유 칸 탭</p>'
+      +'<p class="sub" style="margin:0 0 8px">공식 10 + N×1 + R×5 + SR×20 + SSR×50 · 확률 N50/R35/SR12/SSR3 불변 · 컴프 아님</p>'
       +'<button class="sec" id="stageGo" style="width:100%">무대 켜기</button>'
       +'<div id="stageOut" class="sub" style="margin-top:8px"></div>'
       +'</div>'
@@ -216,7 +223,17 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       try{legionTrack('activate',{multi:10,got:got})}catch(e){}
       try{legionTrack('share_peak_shown',{multi:10})}catch(e){}
     };
-    var bc=document.getElementById('bagClear'); if(bc) bc.onclick=function(){ if(!confirm('가방 비울까?'))return; bag={}; owned={}; localStorage.setItem('idol_bag','{}'); localStorage.setItem('idol_own','{}'); render(); try{legionTrack('bag_clear',{})}catch(e){} };
+    var bc=document.getElementById('bagClear'); if(bc) bc.onclick=function(){ if(!confirm('가방 비울까?'))return; bag={}; owned={}; leadId=''; localStorage.setItem('idol_bag','{}'); localStorage.setItem('idol_own','{}'); try{localStorage.removeItem('idol_lead');}catch(e){} render(); try{legionTrack('bag_clear',{})}catch(e){} };
+    document.querySelectorAll('[data-pick]').forEach(function(el){
+      el.onclick=function(){
+        var id=el.getAttribute('data-pick');
+        if(!id || !(owned[id]||0)) return;
+        leadId=id;
+        try{localStorage.setItem('idol_lead',id);}catch(e){}
+        render();
+        try{legionTrack('stage_lead',{id:id})}catch(e){}
+      };
+    });
     var sg=document.getElementById('stageGo');
     if(sg) sg.onclick=function(){
       var lead=stageLead();
@@ -228,8 +245,8 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
         return;
       }
       if(out) out.innerHTML='<div class="stage-score">'+sc+'</div>'
-        +'<div>'+lead.e+' '+lead.name+' '+lead.rar+' · 주연(최고 티어)</div>'
-        +'<div class="sub">가산 N'+b.N+' R'+b.R+' SR'+b.SR+' SSR'+b.SSR+' · 난수 0 · 컴프 0</div>';
+        +'<div>'+lead.e+' '+lead.name+' '+lead.rar+' · 주연'+(leadId===lead.id?'(탭)':'(최고 티어)')+'</div>'
+        +'<div class="sub">가산 N'+b.N+' R'+b.R+' SR'+b.SR+' SSR'+b.SSR+' · 난수 0 · 컴프 0 · 확률 불변</div>';
       try{legionTrack('stage_turn',{score:sc,lead:lead.id})}catch(e){}
     };
     document.getElementById('get').onclick=function(){
