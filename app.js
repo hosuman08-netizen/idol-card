@@ -133,6 +133,24 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     var b=ownedByRar();
     return 10 + b.N*1 + b.R*5 + b.SR*20 + b.SSR*50;
   }
+  function loadStageHist(){
+    try{
+      var h=JSON.parse(localStorage.getItem('idol_stage_hist')||'[]');
+      return Array.isArray(h)?h:[];
+    }catch(e){ return []; }
+  }
+  function pushStageHist(sc, lead){
+    try{
+      var h=loadStageHist();
+      h.unshift({s:sc, id:lead&&lead.id||'', rar:lead&&lead.rar||'', n:lead&&lead.name||''});
+      localStorage.setItem('idol_stage_hist', JSON.stringify(h.slice(0,7)));
+    }catch(e){}
+  }
+  function stageHistLine(){
+    var h=loadStageHist();
+    if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7</p>';
+    return '<p id="stageHist" class="sub" style="margin:8px 0 0">기록 '+h.map(function(x){return x.s;}).join(' · ')+'</p>';
+  }
   function stageLead(){
     if(leadId){
       var chosen=null;
@@ -169,6 +187,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       +'<p class="sub" style="margin:0 0 8px">공식 10 + N×1 + R×5 + SR×20 + SSR×50 · 확률 N50/R35/SR12/SSR3 불변 · 컴프 아님</p>'
       +'<button class="sec" id="stageGo" style="width:100%">무대 켜기</button>'
       +'<div id="stageOut" class="sub" style="margin-top:8px"></div>'
+      +stageHistLine()
       +'</div>'
       +'<div id="flipStage" style="display:none"></div>'
       +'<div id="log" class="sub" style="margin-top:10px">'+(lastCard?'마지막: '+cardLabel(lastCard):'첫 카드를 뽑아보세요')+' · bag N'+(bag.N||0)+' R'+(bag.R||0)+' SR'+(bag.SR||0)+' SSR'+(bag.SSR||0)+'</div>'
@@ -244,9 +263,12 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
         if(out) out.textContent='뽑은 카드로 무대 · 컴프/세트완성 아님 · 확률 불변';
         return;
       }
+      pushStageHist(sc, lead);
       if(out) out.innerHTML='<div class="stage-score">'+sc+'</div>'
         +'<div>'+lead.e+' '+lead.name+' '+lead.rar+' · 주연'+(leadId===lead.id?'(탭)':'(최고 티어)')+'</div>'
         +'<div class="sub">가산 N'+b.N+' R'+b.R+' SR'+b.SR+' SSR'+b.SSR+' · 난수 0 · 컴프 0 · 확률 불변</div>';
+      var hist=document.getElementById('stageHist');
+      if(hist) hist.outerHTML=stageHistLine();
       try{legionTrack('stage_turn',{score:sc,lead:lead.id})}catch(e){}
     };
     document.getElementById('get').onclick=function(){
