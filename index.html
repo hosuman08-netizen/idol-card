@@ -20,6 +20,12 @@ input,select,textarea{width:100%;background:#0e0c14;border:1px solid var(--line)
 .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#fff3);width:0;transition:width .25s}
 .chip{display:inline-block;padding:4px 8px;border-radius:999px;background:#1c1826;font-size:11px;color:var(--dim);margin:2px}
 .chip b{color:var(--gold)}
+.flip-wrap{perspective:900px;height:148px;margin:10px 0}
+.flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 1s ease-out}
+.flip-inner.ok{transform:rotateY(180deg)}
+.flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-direction:column;border:1px solid var(--line)}
+.flip-back{background:#1c1826;letter-spacing:.2em;color:var(--dim);font-weight:800}
+.flip-front{transform:rotateY(180deg);background:#15131d;font-size:22px;font-weight:800}
 #out{font-size:13px;margin-top:8px;white-space:pre-wrap}
 a{color:var(--gold)}
 footer{text-align:center;color:var(--dim);font-size:11px;margin-top:22px;line-height:1.6}
@@ -27,7 +33,7 @@ footer{text-align:center;color:var(--dim);font-size:11px;margin-top:22px;line-he
 </style></head><body>
 <p class="sub">idol-card · Legion live</p>
 <h1>Idol Card</h1>
-<p class="sub">18+ 카드 뽑기 시뮬</p>
+<p class="sub">18+ 픽션 로스터 12 · 컴프 아님 · 실아이돌 IP 0</p>
 <div id="app"></div>
 <p style="text-align:center;margin-top:14px"><a href="https://hosuman08-netizen.github.io/legion-hub/">← Legion Arcade</a></p>
 <footer>Fictional entertainment · 18+ · 확률/보상 가상<br>© Legion</footer>
@@ -35,4 +41,5 @@ footer{text-align:center;color:var(--dim);font-size:11px;margin-top:22px;line-he
 <script src="legion-beacon.js"></script>
 <script src="app.js"></script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){});}</script>
+  <script src="lung-surprise-eye.js"></script>
 </body></html>

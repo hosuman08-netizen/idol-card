@@ -7,6 +7,28 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
   var root=document.getElementById('app');
   var SHARE_BASE='https://hosuman08-netizen.github.io/idol-card/';
   var lastRar='';
+  var lastCard=null;
+  /* GOLD50 TOP1: SuperStar/Enstars — named card identity. Fictional 12. 실아이돌 IP 0. 컴프/세트완성 보상 0 */
+  var ROSTER=[
+    {id:'n1',rar:'N',name:'린',e:'🌙'},
+    {id:'n2',rar:'N',name:'하율',e:'🍃'},
+    {id:'n3',rar:'N',name:'노을',e:'🌅'},
+    {id:'n4',rar:'N',name:'진',e:'🪨'},
+    {id:'r1',rar:'R',name:'미르',e:'🌊'},
+    {id:'r2',rar:'R',name:'솔아',e:'☀️'},
+    {id:'r3',rar:'R',name:'카이',e:'⚡'},
+    {id:'r4',rar:'R',name:'은',e:'❄️'},
+    {id:'sr1',rar:'SR',name:'루나',e:'🦋'},
+    {id:'sr2',rar:'SR',name:'에이든',e:'🔥'},
+    {id:'ssr1',rar:'SSR',name:'세온',e:'✨'},
+    {id:'ssr2',rar:'SSR',name:'리아',e:'💎'}
+  ];
+  function pickCard(rar){
+    var pool=ROSTER.filter(function(c){return c.rar===rar;});
+    if(!pool.length) return {id:'?',rar:rar,name:'?',e:'·'};
+    return pool[Math.floor(Math.random()*pool.length)];
+  }
+  function cardLabel(c){return c?(c.e+' '+c.name+' '+c.rar):'';}
   function save(){localStorage.setItem('idol-card_cr',credits);}
   function dayKey(off){
     var d=new Date(); d.setDate(d.getDate()+(off||0));
@@ -68,6 +90,24 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     var ms=Math.max(0,end-Date.now());
     return Math.floor(ms/3600000)+'h '+Math.floor((ms%3600000)/60000)+'m';
   }
+  /* GOLD50 TOP2: Pocket/HS pack flip ~1s. 희귀도별 duration. 사운드 없음. 컴프 0 */
+  function playFlip(card){
+    var el=document.getElementById('flipStage');
+    if(!el||!card) return;
+    var col={N:'#64748b',R:'#67e8f9',SR:'#c4b5fd',SSR:'#fbbf24'}[card.rar]||'#64748b';
+    var dur={N:'0.7s',R:'0.85s',SR:'1s',SSR:'1.15s'}[card.rar]||'1s';
+    el.style.display='block';
+    el.innerHTML='<div class="flip-wrap"><div class="flip-inner" id="flipInner" style="transition-duration:'+dur+'">'
+      +'<div class="flip-face flip-back">CARD</div>'
+      +'<div class="flip-face flip-front" style="border-color:'+col+';color:'+col+'"><span>'+card.e+' '+card.name+'</span><span class="sub" style="margin:6px 0 0;color:'+col+'">'+card.rar+'</span></div>'
+      +'</div></div>';
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        var inn=document.getElementById('flipInner');
+        if(inn) inn.classList.add('ok');
+      });
+    });
+  }
   function bagBar(){
     var tot=Math.max(1,(bag.N||0)+(bag.R||0)+(bag.SR||0)+(bag.SSR||0));
     function seg(n,c){var w=Math.max(2,Math.round((n||0)/tot*100)); return '<i style="display:inline-block;width:'+w+'%;height:8px;background:'+c+'"></i>';}
@@ -86,7 +126,10 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       +'<div style="height:8px;background:#1c1826;border-radius:4px;margin-top:8px;overflow:hidden" title="soft pity '+pity+'/30"><i style="display:block;height:100%;width:'+Math.min(100,Math.round(pity/30*100))+'%;background:linear-gradient(90deg,#c4b5fd,#fbbf24)"></i></div>'
       +bagBar()+"<button class='sec' id='bagClear' style='margin-top:8px;width:100%'>가방 초기화(체험)</button>"
       +'<div class="row" style="margin-top:10px"><button id="use">1 사용</button><button class="sec" id="use10">10연 (×10)</button><button class="sec" id="get">무료 +3</button></div>'
-      +'<div id="log" class="sub" style="margin-top:10px">'+(lastRar?'마지막: '+lastRar:'첫 카드를 뽑아보세요')+' · bag N'+(bag.N||0)+' R'+(bag.R||0)+' SR'+(bag.SR||0)+' SSR'+(bag.SSR||0)+'</div>'
+      +'<div class="sub" style="margin-top:8px">픽션 로스터 12 · 세트완성 보상 없음 · 실아이돌 IP 0</div>'
+      +'<div>'+ROSTER.map(function(c){return '<span class="chip">'+c.e+' '+c.name+'</span>';}).join(' ')+'</div>'
+      +'<div id="flipStage" style="display:none"></div>'
+      +'<div id="log" class="sub" style="margin-top:10px">'+(lastCard?'마지막: '+cardLabel(lastCard):'첫 카드를 뽑아보세요')+' · bag N'+(bag.N||0)+' R'+(bag.R||0)+' SR'+(bag.SR||0)+' SSR'+(bag.SSR||0)+'</div>'
       +'<div id="sharePeak" style="display:none;margin-top:12px;padding:10px;border:1px solid #f472b644;border-radius:12px">'
       +'<p style="margin:0 0 6px;font-size:13px">✨ 뽑은 직후 — 공유</p>'
       +'<button class="sec" id="shareBtn">📤 결과 공유</button></div>'
@@ -102,27 +145,35 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       if(pity>=30){rar='SSR';} else if(roll<ssrP){rar='SSR';} else if(roll<ssrP+0.12){rar='SR';} else if(roll<ssrP+0.12+0.35){rar='R';} else {rar='N';}
       if(rar==='SSR'){pity=0; bestSSR++; localStorage.setItem('idol_best_ssr',bestSSR);} else {pity++;}
       localStorage.setItem('idol_pity',pity); bag[rar]=(bag[rar]||0)+1; localStorage.setItem('idol_bag',JSON.stringify(bag));
-      lastRar=rar; setBest(rar); pushHist(rar); bumpToday();
-      return rar;
+      var card=pickCard(rar);
+      lastRar=rar; lastCard=card; setBest(rar); pushHist(rar); bumpToday();
+      return card;
     }
     document.getElementById('use').onclick=function(){
       if(credits<=0){document.getElementById('log').textContent='크레딧 없음 · 무료 충전 또는 후원 문의';try{legionTrack('money_pipe_shown',{app:'idol',empty:1})}catch(e){}return;}
       credits--;save();
-      var rar=onePull();
+      var card=onePull();
       bumpStreak();
       render();
-      document.getElementById('log').textContent='카드 '+rar+' · '+new Date().toLocaleTimeString()+' · 확률 N50/R35/SR12/SSR3 · soft pity '+pity+'/30';
+      playFlip(card);
+      document.getElementById('log').textContent='카드 '+cardLabel(card)+' · '+new Date().toLocaleTimeString()+' · 확률 N50/R35/SR12/SSR3 · soft pity '+pity+'/30';
       var peak=document.getElementById('sharePeak'); if(peak) peak.style.display='block';
-      try{legionTrack('activate',{credits:credits,rar:rar})}catch(e){}
-      try{legionTrack('share_peak_shown',{rar:rar})}catch(e){}
+      try{legionTrack('activate',{credits:credits,rar:card.rar})}catch(e){}
+      try{legionTrack('share_peak_shown',{rar:card.rar})}catch(e){}
       try{legionTrack('money_pipe_shown',{app:'idol'})}catch(e){}
     };
     document.getElementById('use10').onclick=function(){
       if(credits<10){document.getElementById('log').textContent='10연은 크레딧 10 필요 · 현재 '+credits;try{legionTrack('money_pipe_shown',{app:'idol',empty:1})}catch(e){}return;}
       credits-=10;save();
-      var got=[]; for(var k=0;k<10;k++) got.push(onePull());
+      var got=[]; var last=null; var best=null;
+      var rank={N:1,R:2,SR:3,SSR:4};
+      for(var k=0;k<10;k++){
+        last=onePull(); got.push(cardLabel(last));
+        if(!best||(rank[last.rar]||0)>(rank[best.rar]||0)) best=last;
+      }
       bumpStreak();
       render();
+      playFlip(best||last);
       document.getElementById('log').textContent='10연: '+got.join(' · ')+' · soft pity '+pity+'/30';
       var peak=document.getElementById('sharePeak'); if(peak) peak.style.display='block';
       try{legionTrack('activate',{multi:10,got:got})}catch(e){}
@@ -136,7 +187,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     };
     var sb=document.getElementById('shareBtn');
     if(sb) sb.onclick=function(){
-      var text='Idol Card '+lastRar+' (fictional 18+) · rates N50/R35/SR12/SSR3\n'+shareUrl();
+      var text='Idol Card '+(lastCard?cardLabel(lastCard):lastRar)+' (fictional 18+) · rates N50/R35/SR12/SSR3 · 컴프아님\n'+shareUrl();
       if(navigator.share) navigator.share({text:text,url:shareUrl()}).catch(function(){});
       else if(navigator.clipboard) navigator.clipboard.writeText(text);
       try{shareN++;localStorage.setItem('idol_share_n',shareN);}catch(e){} try{legionTrack('share_peak',{rar:lastRar})}catch(e){}
