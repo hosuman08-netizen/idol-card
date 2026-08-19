@@ -210,11 +210,26 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     nEl.title='CSV 복사 · '+stageHistCsvNChip(n);
     return n;
   }
+  function histCsvCopyOkLine(n, copied){
+    if(!copied) return '';
+    return '복사 확인 · '+(+n||0)+'행 · 컴프 0 · 확률 불변';
+  }
+  function paintHistCsvCopyOk(n, copied){
+    var el=document.getElementById('histCsvCopyOk');
+    if(!el) return '';
+    var line=histCsvCopyOkLine(n, copied);
+    el.textContent=line;
+    el.setAttribute('data-ok', copied?'1':'0');
+    if(line) el.removeAttribute('hidden');
+    else el.setAttribute('hidden','');
+    return line;
+  }
   function applyStageHistCsvCopy(from){
     var csv=copyStageHistCsv();
     var n=(loadStageHist()||[]).length;
     var rows=stageHistCsvRowN(csv);
     paintHistCsvNChip(rows, true);
+    paintHistCsvCopyOk(rows, true);
     var out=document.getElementById('stageOut');
     try{
       if(typeof navigator!=='undefined' && navigator.clipboard && navigator.clipboard.writeText){
@@ -252,7 +267,8 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     var h=loadStageHist();
     var csvBtn=' <button type="button" class="sec" id="histCsv" style="padding:2px 8px;font-size:11px;margin-left:4px" title="'+stageHistCsvName()+'">'+stageHistCsvBtnLabel()+'</button>'
       +' <button type="button" class="sec" id="histCsvCopy" style="padding:2px 8px;font-size:11px;margin-left:4px" title="'+stageHistCsvName()+'">'+stageHistCsvCopyLabel()+'</button>'
-      +' <span id="histCsvCopyN" class="chip" role="button" tabindex="0" style="margin-left:4px;cursor:pointer" title="CSV 복사 · '+stageHistCsvNChip(stageHistCsvRowN(stageHistCsv()))+'" data-n="'+stageHistCsvRowN(stageHistCsv())+'" data-copied="0">'+stageHistCsvNChip(stageHistCsvRowN(stageHistCsv()))+'</span>';
+      +' <span id="histCsvCopyN" class="chip" role="button" tabindex="0" style="margin-left:4px;cursor:pointer" title="CSV 복사 · '+stageHistCsvNChip(stageHistCsvRowN(stageHistCsv()))+'" data-n="'+stageHistCsvRowN(stageHistCsv())+'" data-copied="0">'+stageHistCsvNChip(stageHistCsvRowN(stageHistCsv()))+'</span>'
+      +' <span id="histCsvCopyOk" class="sub" hidden data-ok="0" style="margin-left:4px"></span>';
     if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7'+csvBtn+'</p>';
     return '<div id="stageHist" class="sub" style="margin:8px 0 0">기록 '
       +h.map(function(x,i){
