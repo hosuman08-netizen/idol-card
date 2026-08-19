@@ -151,6 +151,18 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7</p>';
     return '<p id="stageHist" class="sub" style="margin:8px 0 0">기록 '+h.map(function(x){return x.s;}).join(' · ')+'</p>';
   }
+  function stageBest(){
+    var m=0;
+    loadStageHist().forEach(function(x){
+      var s=x&&x.s;
+      if(typeof s==='number' && s>m) m=s;
+    });
+    return m;
+  }
+  function stageBestChip(){
+    var m=stageBest();
+    return '<span class="chip" id="stageBest">최고 점수 '+(m||'—')+'</span>';
+  }
   function stageLead(){
     if(leadId){
       var chosen=null;
@@ -186,6 +198,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       +'<p class="sub" style="margin:0 0 6px">무대 1턴 · 난수 아님 · 보유 티어 가산만 · 세트완성 보너스 0 · 주연은 보유 칸 탭</p>'
       +'<p class="sub" style="margin:0 0 8px">공식 10 + N×1 + R×5 + SR×20 + SSR×50 · 확률 N50/R35/SR12/SSR3 불변 · 컴프 아님</p>'
       +'<button class="sec" id="stageGo" style="width:100%">무대 켜기</button>'
+      +'<div style="margin-top:8px">'+stageBestChip()+'</div>'
       +'<div id="stageOut" class="sub" style="margin-top:8px"></div>'
       +stageHistLine()
       +'</div>'
@@ -269,6 +282,8 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
         +'<div class="sub">가산 N'+b.N+' R'+b.R+' SR'+b.SR+' SSR'+b.SSR+' · 난수 0 · 컴프 0 · 확률 불변</div>';
       var hist=document.getElementById('stageHist');
       if(hist) hist.outerHTML=stageHistLine();
+      var bestEl=document.getElementById('stageBest');
+      if(bestEl) bestEl.outerHTML=stageBestChip();
       try{legionTrack('stage_turn',{score:sc,lead:lead.id})}catch(e){}
     };
     document.getElementById('get').onclick=function(){
