@@ -26,6 +26,12 @@ input,select,textarea{width:100%;background:#0e0c14;border:1px solid var(--line)
 .flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-direction:column;border:1px solid var(--line)}
 .flip-back{background:#1c1826;letter-spacing:.2em;color:var(--dim);font-weight:800}
 .flip-front{transform:rotateY(180deg);background:#15131d;font-size:22px;font-weight:800}
+.col-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.col-cell{border:1px solid var(--line);border-radius:10px;padding:10px 4px;text-align:center;min-height:76px;background:#12101a}
+.col-cell.have{border-color:var(--gold);background:#1c1826}
+.col-cell.mute{opacity:.42}
+.col-cell .e{font-size:20px;line-height:1.2}
+.col-cell .n{font-size:12px;margin-top:4px;font-weight:700}
 #out{font-size:13px;margin-top:8px;white-space:pre-wrap}
 a{color:var(--gold)}
 footer{text-align:center;color:var(--dim);font-size:11px;margin-top:22px;line-height:1.6}

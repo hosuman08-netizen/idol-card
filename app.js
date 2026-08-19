@@ -3,7 +3,7 @@
 /* LEGION_WAVE_31_session_counter */
 try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorage.setItem('lw_p37_idol_car_session_counter','1');localStorage.setItem('lw_p37_idol_car_session_counter',String((+(localStorage.getItem('lw_p37_idol_car_session_counter')||0))+1));}}catch(e){}
 (function(){
-  var credits=+(localStorage.getItem('idol-card_cr')||10); var pulls=+(localStorage.getItem('idol_pulls')||0); var pity=+(localStorage.getItem('idol_pity')||0); var bag=JSON.parse(localStorage.getItem('idol_bag')||'{}'); var bestSSR=+(localStorage.getItem('idol_best_ssr')||0); var shareN=+(localStorage.getItem('idol_share_n')||0);
+  var credits=+(localStorage.getItem('idol-card_cr')||10); var pulls=+(localStorage.getItem('idol_pulls')||0); var pity=+(localStorage.getItem('idol_pity')||0); var bag=JSON.parse(localStorage.getItem('idol_bag')||'{}'); var owned=JSON.parse(localStorage.getItem('idol_own')||'{}'); var bestSSR=+(localStorage.getItem('idol_best_ssr')||0); var shareN=+(localStorage.getItem('idol_share_n')||0);
   var root=document.getElementById('app');
   var SHARE_BASE='https://hosuman08-netizen.github.io/idol-card/';
   var lastRar='';
@@ -113,6 +113,14 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     function seg(n,c){var w=Math.max(2,Math.round((n||0)/tot*100)); return '<i style="display:inline-block;width:'+w+'%;height:8px;background:'+c+'"></i>';}
     return '<div style="display:flex;width:100%;border-radius:4px;overflow:hidden;margin-top:6px">'+seg(bag.N,'#64748b')+seg(bag.R,'#67e8f9')+seg(bag.SR,'#c4b5fd')+seg(bag.SSR,'#fbbf24')+'</div>';
   }
+  /* GOLD50 TOP3: K-Collect/PokéCardex 보유 격자. 컴프/세트완성 보상 0. "전부 모아" 카피 0 */
+  function rosterBoard(){
+    return '<p class="sub" style="margin-top:10px">보유 보드 · 세트완성 보상 없음 · 컴프 아님</p>'
+      +'<div class="col-grid">'+ROSTER.map(function(c){
+        var n=owned[c.id]||0;
+        return '<div class="col-cell '+(n?'have':'mute')+'"><div class="e">'+c.e+'</div><div class="n">'+c.name+'</div><div class="sub" style="margin:2px 0 0">'+c.rar+(n?' · '+n:'')+'</div></div>';
+      }).join('')+'</div>';
+  }
   function render(){
     var st=JSON.parse(localStorage.getItem('idol_streak')||'{}');
     var sc=st.count||0;
@@ -127,7 +135,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       +bagBar()+"<button class='sec' id='bagClear' style='margin-top:8px;width:100%'>가방 초기화(체험)</button>"
       +'<div class="row" style="margin-top:10px"><button id="use">1 사용</button><button class="sec" id="use10">10연 (×10)</button><button class="sec" id="get">무료 +3</button></div>'
       +'<div class="sub" style="margin-top:8px">픽션 로스터 12 · 세트완성 보상 없음 · 실아이돌 IP 0</div>'
-      +'<div>'+ROSTER.map(function(c){return '<span class="chip">'+c.e+' '+c.name+'</span>';}).join(' ')+'</div>'
+      +rosterBoard()
       +'<div id="flipStage" style="display:none"></div>'
       +'<div id="log" class="sub" style="margin-top:10px">'+(lastCard?'마지막: '+cardLabel(lastCard):'첫 카드를 뽑아보세요')+' · bag N'+(bag.N||0)+' R'+(bag.R||0)+' SR'+(bag.SR||0)+' SSR'+(bag.SSR||0)+'</div>'
       +'<div id="sharePeak" style="display:none;margin-top:12px;padding:10px;border:1px solid #f472b644;border-radius:12px">'
@@ -147,6 +155,8 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       localStorage.setItem('idol_pity',pity); bag[rar]=(bag[rar]||0)+1; localStorage.setItem('idol_bag',JSON.stringify(bag));
       var card=pickCard(rar);
       lastRar=rar; lastCard=card; setBest(rar); pushHist(rar); bumpToday();
+      owned[card.id]=(owned[card.id]||0)+1;
+      try{localStorage.setItem('idol_own',JSON.stringify(owned));}catch(e){}
       return card;
     }
     document.getElementById('use').onclick=function(){
@@ -179,7 +189,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       try{legionTrack('activate',{multi:10,got:got})}catch(e){}
       try{legionTrack('share_peak_shown',{multi:10})}catch(e){}
     };
-    var bc=document.getElementById('bagClear'); if(bc) bc.onclick=function(){ if(!confirm('가방 비울까?'))return; bag={}; localStorage.setItem('idol_bag','{}'); render(); try{legionTrack('bag_clear',{})}catch(e){} };
+    var bc=document.getElementById('bagClear'); if(bc) bc.onclick=function(){ if(!confirm('가방 비울까?'))return; bag={}; owned={}; localStorage.setItem('idol_bag','{}'); localStorage.setItem('idol_own','{}'); render(); try{legionTrack('bag_clear',{})}catch(e){} };
     document.getElementById('get').onclick=function(){
       var k='idol-card_cd_'+new Date().toDateString();
       if(localStorage.getItem(k)){document.getElementById('log').textContent='오늘 무료 충전 완료';return;}
