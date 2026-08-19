@@ -194,6 +194,19 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
   function stageHistCsvCopyNLine(n){
     return '복사 '+(+n||0)+'행';
   }
+  function stageHistCsvNChip(n){
+    return (+n||0)+'행';
+  }
+  function paintHistCsvNChip(n, copied){
+    var nEl=document.getElementById('histCsvCopyN');
+    if(!nEl) return n;
+    nEl.textContent=copied?stageHistCsvCopyNLine(n):stageHistCsvNChip(n);
+    nEl.className='chip';
+    nEl.setAttribute('data-n', String(+n||0));
+    nEl.setAttribute('data-copied', copied?'1':'0');
+    nEl.title=stageHistCsvNChip(n);
+    return n;
+  }
   function downloadStageHistCsv(){
     var csv=stageHistCsv();
     var name=stageHistCsvName();
@@ -217,7 +230,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     var h=loadStageHist();
     var csvBtn=' <button type="button" class="sec" id="histCsv" style="padding:2px 8px;font-size:11px;margin-left:4px" title="'+stageHistCsvName()+'">'+stageHistCsvBtnLabel()+'</button>'
       +' <button type="button" class="sec" id="histCsvCopy" style="padding:2px 8px;font-size:11px;margin-left:4px" title="'+stageHistCsvName()+'">'+stageHistCsvCopyLabel()+'</button>'
-      +' <span id="histCsvCopyN" class="sub" style="margin-left:4px"></span>';
+      +' <span id="histCsvCopyN" class="chip" style="margin-left:4px" data-n="'+stageHistCsvRowN(stageHistCsv())+'" data-copied="0">'+stageHistCsvNChip(stageHistCsvRowN(stageHistCsv()))+'</span>';
     if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7'+csvBtn+'</p>';
     return '<div id="stageHist" class="sub" style="margin:8px 0 0">기록 '
       +h.map(function(x,i){
@@ -271,8 +284,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       var csv=copyStageHistCsv();
       var n=(loadStageHist()||[]).length;
       var rows=stageHistCsvRowN(csv);
-      var nEl=document.getElementById('histCsvCopyN');
-      if(nEl) nEl.textContent=stageHistCsvCopyNLine(rows);
+      paintHistCsvNChip(rows, true);
       var out=document.getElementById('stageOut');
       try{
         if(typeof navigator!=='undefined' && navigator.clipboard && navigator.clipboard.writeText){
