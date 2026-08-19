@@ -204,8 +204,30 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     nEl.className='chip';
     nEl.setAttribute('data-n', String(+n||0));
     nEl.setAttribute('data-copied', copied?'1':'0');
-    nEl.title=stageHistCsvNChip(n);
+    nEl.setAttribute('role','button');
+    nEl.tabIndex=0;
+    nEl.style.cursor='pointer';
+    nEl.title='CSV 복사 · '+stageHistCsvNChip(n);
     return n;
+  }
+  function applyStageHistCsvCopy(from){
+    var csv=copyStageHistCsv();
+    var n=(loadStageHist()||[]).length;
+    var rows=stageHistCsvRowN(csv);
+    paintHistCsvNChip(rows, true);
+    var out=document.getElementById('stageOut');
+    try{
+      if(typeof navigator!=='undefined' && navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(csv);
+        if(out) out.textContent='CSV 복사 '+n+'/7 · '+stageHistCsvName()+' · 컴프 0 · 확률 불변';
+      }else if(out){
+        out.textContent='클립보드 없음 · 다운로드 사용 · 컴프 0';
+      }
+    }catch(e){
+      if(out) out.textContent='복사 실패 · 다운로드 사용 · 컴프 0';
+    }
+    try{legionTrack('stage_hist_csv_copy',{n:n,rows:rows,from:from||'btn'})}catch(e2){}
+    return csv;
   }
   function downloadStageHistCsv(){
     var csv=stageHistCsv();
@@ -230,7 +252,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     var h=loadStageHist();
     var csvBtn=' <button type="button" class="sec" id="histCsv" style="padding:2px 8px;font-size:11px;margin-left:4px" title="'+stageHistCsvName()+'">'+stageHistCsvBtnLabel()+'</button>'
       +' <button type="button" class="sec" id="histCsvCopy" style="padding:2px 8px;font-size:11px;margin-left:4px" title="'+stageHistCsvName()+'">'+stageHistCsvCopyLabel()+'</button>'
-      +' <span id="histCsvCopyN" class="chip" style="margin-left:4px" data-n="'+stageHistCsvRowN(stageHistCsv())+'" data-copied="0">'+stageHistCsvNChip(stageHistCsvRowN(stageHistCsv()))+'</span>';
+      +' <span id="histCsvCopyN" class="chip" role="button" tabindex="0" style="margin-left:4px;cursor:pointer" title="CSV 복사 · '+stageHistCsvNChip(stageHistCsvRowN(stageHistCsv()))+'" data-n="'+stageHistCsvRowN(stageHistCsv())+'" data-copied="0">'+stageHistCsvNChip(stageHistCsvRowN(stageHistCsv()))+'</span>';
     if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7'+csvBtn+'</p>';
     return '<div id="stageHist" class="sub" style="margin:8px 0 0">기록 '
       +h.map(function(x,i){
@@ -281,23 +303,21 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     var csvCopy=document.getElementById('histCsvCopy');
     if(csvCopy) csvCopy.onclick=function(ev){
       if(ev && ev.stopPropagation) ev.stopPropagation();
-      var csv=copyStageHistCsv();
-      var n=(loadStageHist()||[]).length;
-      var rows=stageHistCsvRowN(csv);
-      paintHistCsvNChip(rows, true);
-      var out=document.getElementById('stageOut');
-      try{
-        if(typeof navigator!=='undefined' && navigator.clipboard && navigator.clipboard.writeText){
-          navigator.clipboard.writeText(csv);
-          if(out) out.textContent='CSV 복사 '+n+'/7 · '+stageHistCsvName()+' · 컴프 0 · 확률 불변';
-        }else if(out){
-          out.textContent='클립보드 없음 · 다운로드 사용 · 컴프 0';
-        }
-      }catch(e){
-        if(out) out.textContent='복사 실패 · 다운로드 사용 · 컴프 0';
-      }
-      try{legionTrack('stage_hist_csv_copy',{n:n,rows:rows})}catch(e2){}
-      return csv;
+      return applyStageHistCsvCopy('btn');
+    };
+    var nChip=document.getElementById('histCsvCopyN');
+    if(nChip){
+      nChip.onclick=function(ev){
+        if(ev && ev.stopPropagation) ev.stopPropagation();
+        return applyStageHistCsvCopy('chip');
+      };
+      nChip.onkeydown=function(ev){
+        var k=ev&&ev.key;
+        if(k!=='Enter' && k!==' ') return;
+        if(ev && ev.preventDefault) ev.preventDefault();
+        if(ev && ev.stopPropagation) ev.stopPropagation();
+        return applyStageHistCsvCopy('chip');
+      };
     };
     root.querySelectorAll('[data-hist-del]').forEach(function(el){
       el.onclick=function(ev){
