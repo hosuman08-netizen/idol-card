@@ -186,6 +186,14 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
   function copyStageHistCsv(){
     return stageHistCsv();
   }
+  function stageHistCsvRowN(csv){
+    var lines=String(csv==null?'':csv).split(/\r?\n/).filter(function(x){ return String(x).length; });
+    if(!lines.length) return 0;
+    return Math.max(0, lines.length-1);
+  }
+  function stageHistCsvCopyNLine(n){
+    return '복사 '+(+n||0)+'행';
+  }
   function downloadStageHistCsv(){
     var csv=stageHistCsv();
     var name=stageHistCsvName();
@@ -208,7 +216,8 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
   function stageHistLine(){
     var h=loadStageHist();
     var csvBtn=' <button type="button" class="sec" id="histCsv" style="padding:2px 8px;font-size:11px;margin-left:4px" title="'+stageHistCsvName()+'">'+stageHistCsvBtnLabel()+'</button>'
-      +' <button type="button" class="sec" id="histCsvCopy" style="padding:2px 8px;font-size:11px;margin-left:4px" title="'+stageHistCsvName()+'">'+stageHistCsvCopyLabel()+'</button>';
+      +' <button type="button" class="sec" id="histCsvCopy" style="padding:2px 8px;font-size:11px;margin-left:4px" title="'+stageHistCsvName()+'">'+stageHistCsvCopyLabel()+'</button>'
+      +' <span id="histCsvCopyN" class="sub" style="margin-left:4px"></span>';
     if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7'+csvBtn+'</p>';
     return '<div id="stageHist" class="sub" style="margin:8px 0 0">기록 '
       +h.map(function(x,i){
@@ -261,6 +270,9 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       if(ev && ev.stopPropagation) ev.stopPropagation();
       var csv=copyStageHistCsv();
       var n=(loadStageHist()||[]).length;
+      var rows=stageHistCsvRowN(csv);
+      var nEl=document.getElementById('histCsvCopyN');
+      if(nEl) nEl.textContent=stageHistCsvCopyNLine(rows);
       var out=document.getElementById('stageOut');
       try{
         if(typeof navigator!=='undefined' && navigator.clipboard && navigator.clipboard.writeText){
@@ -272,7 +284,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       }catch(e){
         if(out) out.textContent='복사 실패 · 다운로드 사용 · 컴프 0';
       }
-      try{legionTrack('stage_hist_csv_copy',{n:n})}catch(e2){}
+      try{legionTrack('stage_hist_csv_copy',{n:n,rows:rows})}catch(e2){}
       return csv;
     };
     root.querySelectorAll('[data-hist-del]').forEach(function(el){
