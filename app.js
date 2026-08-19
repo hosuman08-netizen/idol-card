@@ -174,9 +174,12 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     });
     return lines.join('\n');
   }
+  function stageHistCsvName(day){
+    return 'idol-stage-hist-'+(day||dayKey(0))+'.csv';
+  }
   function downloadStageHistCsv(){
     var csv=stageHistCsv();
-    var name='idol-stage-hist.csv';
+    var name=stageHistCsvName();
     try{
       if(typeof Blob==='undefined'||typeof document==='undefined') return csv;
       var blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
@@ -195,7 +198,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
   }
   function stageHistLine(){
     var h=loadStageHist();
-    var csvBtn=' <button type="button" class="sec" id="histCsv" style="padding:2px 8px;font-size:11px;margin-left:4px">CSV</button>';
+    var csvBtn=' <button type="button" class="sec" id="histCsv" style="padding:2px 8px;font-size:11px;margin-left:4px">CSV '+dayKey(0)+'</button>';
     if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7'+csvBtn+'</p>';
     return '<div id="stageHist" class="sub" style="margin:8px 0 0">기록 '
       +h.map(function(x,i){
@@ -239,7 +242,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       var csv=downloadStageHistCsv();
       var n=(loadStageHist()||[]).length;
       var out=document.getElementById('stageOut');
-      if(out) out.textContent='CSV 로컬 '+n+'/7 · 컴프 0 · 확률 불변';
+      if(out) out.textContent='CSV 로컬 '+n+'/7 · '+stageHistCsvName()+' · 컴프 0 · 확률 불변';
       try{legionTrack('stage_hist_csv',{n:n})}catch(e){}
       return csv;
     };
