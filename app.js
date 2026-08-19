@@ -160,14 +160,49 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     try{ localStorage.setItem('idol_stage_hist','[]'); }catch(e){}
     return [];
   }
+  function csvCell(v){
+    var s=String(v==null?'':v);
+    if(/[",\n]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+    return s;
+  }
+  function stageHistCsv(h){
+    h=Array.isArray(h)?h:loadStageHist();
+    var lines=['score,name,rar,id'];
+    h.forEach(function(x){
+      if(!x) return;
+      lines.push([csvCell(x.s||0),csvCell(x.n||''),csvCell(x.rar||''),csvCell(x.id||'')].join(','));
+    });
+    return lines.join('\n');
+  }
+  function downloadStageHistCsv(){
+    var csv=stageHistCsv();
+    var name='idol-stage-hist.csv';
+    try{
+      if(typeof Blob==='undefined'||typeof document==='undefined') return csv;
+      var blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+      var url=(typeof URL!=='undefined'&&URL.createObjectURL)?URL.createObjectURL(blob):'';
+      if(!url) return csv;
+      var a=document.createElement('a');
+      a.href=url; a.download=name;
+      if(document.body) document.body.appendChild(a);
+      a.click();
+      if(a.parentNode) a.parentNode.removeChild(a);
+      setTimeout(function(){ try{ URL.revokeObjectURL(url); }catch(e){} },400);
+    }catch(e){
+      try{ if(navigator&&navigator.clipboard) navigator.clipboard.writeText(csv); }catch(e2){}
+    }
+    return csv;
+  }
   function stageHistLine(){
     var h=loadStageHist();
-    if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7</p>';
+    var csvBtn=' <button type="button" class="sec" id="histCsv" style="padding:2px 8px;font-size:11px;margin-left:4px">CSV</button>';
+    if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7'+csvBtn+'</p>';
     return '<div id="stageHist" class="sub" style="margin:8px 0 0">기록 '
       +h.map(function(x,i){
         return '<span class="chip" data-hist="'+i+'" role="button" tabindex="0" style="cursor:pointer">'+(x&&x.s)+' <span data-hist-del="'+i+'" aria-label="기록 지우기" style="opacity:.55;margin-left:2px">×</span></span>';
       }).join('')
       +' <button type="button" class="sec" id="histClear" style="padding:2px 8px;font-size:11px;margin-left:4px">기록 전체 지우기</button>'
+      +csvBtn
       +'</div>';
   }
   function paintStageReplay(x){
@@ -197,6 +232,16 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       if(out) out.textContent='기록 전체 지움 · 로컬 0/7 · 컴프 0 · 확률 불변';
       refreshStageHistUi();
       try{legionTrack('stage_hist_clear',{})}catch(e){}
+    };
+    var csvBtn=document.getElementById('histCsv');
+    if(csvBtn) csvBtn.onclick=function(ev){
+      if(ev && ev.stopPropagation) ev.stopPropagation();
+      var csv=downloadStageHistCsv();
+      var n=(loadStageHist()||[]).length;
+      var out=document.getElementById('stageOut');
+      if(out) out.textContent='CSV 로컬 '+n+'/7 · 컴프 0 · 확률 불변';
+      try{legionTrack('stage_hist_csv',{n:n})}catch(e){}
+      return csv;
     };
     root.querySelectorAll('[data-hist-del]').forEach(function(el){
       el.onclick=function(ev){
