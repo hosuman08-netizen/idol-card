@@ -225,6 +225,15 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     el.setAttribute('data-ok','0');
     el.setAttribute('data-hidden','1');
     el.setAttribute('hidden','');
+    holdHistCsvBtnFocus();
+    return true;
+  }
+  /* WAVE205: 숨김 후 CSV버튼 포커스 · 컴프 0 · 확률 불변 */
+  function holdHistCsvBtnFocus(){
+    var btn=typeof document!=='undefined'?document.getElementById('histCsv'):null;
+    if(!btn) return false;
+    try{ if(btn.focus) btn.focus(); }catch(e1){}
+    if(btn.setAttribute) btn.setAttribute('data-focus-after-hide','1');
     return true;
   }
   /* WAVE157: 확인줄 탭=즉시숨김 · 컴프 0 · 확률 불변 */
