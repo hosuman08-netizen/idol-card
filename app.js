@@ -149,7 +149,34 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
   function stageHistLine(){
     var h=loadStageHist();
     if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7</p>';
-    return '<p id="stageHist" class="sub" style="margin:8px 0 0">기록 '+h.map(function(x){return x.s;}).join(' · ')+'</p>';
+    return '<div id="stageHist" class="sub" style="margin:8px 0 0">기록 '
+      +h.map(function(x,i){
+        return '<span class="chip" data-hist="'+i+'" role="button" tabindex="0" style="cursor:pointer">'+(x&&x.s)+'</span>';
+      }).join('')
+      +'</div>';
+  }
+  function paintStageReplay(x){
+    var out=document.getElementById('stageOut');
+    if(!out||!x) return;
+    var who=[x.n||'',x.rar||''].filter(Boolean).join(' ');
+    out.innerHTML='<div class="stage-score">'+x.s+'</div>'
+      +'<div>기록 재표시'+(who?' · '+who:'')+'</div>'
+      +'<div class="sub">로컬 기록 · 난수 0 · 컴프 0 · 확률 불변</div>';
+  }
+  function wireStageHist(){
+    document.querySelectorAll('#stageHist [data-hist]').forEach(function(el){
+      el.onclick=function(){
+        var i=+el.getAttribute('data-hist');
+        var h=loadStageHist();
+        var x=h[i];
+        if(!x) return;
+        document.querySelectorAll('#stageHist [data-hist]').forEach(function(c){
+          c.style.outline=(c===el)?'1px solid var(--gold)':'none';
+        });
+        paintStageReplay(x);
+        try{legionTrack('stage_replay',{i:i,s:x.s})}catch(e){}
+      };
+    });
   }
   function stageBest(){
     var m=0;
@@ -284,8 +311,10 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       if(hist) hist.outerHTML=stageHistLine();
       var bestEl=document.getElementById('stageBest');
       if(bestEl) bestEl.outerHTML=stageBestChip();
+      wireStageHist();
       try{legionTrack('stage_turn',{score:sc,lead:lead.id})}catch(e){}
     };
+    wireStageHist();
     document.getElementById('get').onclick=function(){
       var k='idol-card_cd_'+new Date().toDateString();
       if(localStorage.getItem(k)){document.getElementById('log').textContent='오늘 무료 충전 완료';return;}
