@@ -146,12 +146,22 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       localStorage.setItem('idol_stage_hist', JSON.stringify(h.slice(0,7)));
     }catch(e){}
   }
+  function delStageHistAt(h, i){
+    if(!Array.isArray(h)) return [];
+    if(i<0 || i>=h.length) return h.slice();
+    return h.slice(0,i).concat(h.slice(i+1));
+  }
+  function delStageHist(i){
+    var h=delStageHistAt(loadStageHist(), i);
+    try{ localStorage.setItem('idol_stage_hist', JSON.stringify(h.slice(0,7))); }catch(e){}
+    return h;
+  }
   function stageHistLine(){
     var h=loadStageHist();
     if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7</p>';
     return '<div id="stageHist" class="sub" style="margin:8px 0 0">기록 '
       +h.map(function(x,i){
-        return '<span class="chip" data-hist="'+i+'" role="button" tabindex="0" style="cursor:pointer">'+(x&&x.s)+'</span>';
+        return '<span class="chip" data-hist="'+i+'" role="button" tabindex="0" style="cursor:pointer">'+(x&&x.s)+' <span data-hist-del="'+i+'" aria-label="기록 지우기" style="opacity:.55;margin-left:2px">×</span></span>';
       }).join('')
       +'</div>';
   }
@@ -163,14 +173,35 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       +'<div>기록 재표시'+(who?' · '+who:'')+'</div>'
       +'<div class="sub">로컬 기록 · 난수 0 · 컴프 0 · 확률 불변</div>';
   }
+  function refreshStageHistUi(){
+    var hist=document.getElementById('stageHist');
+    if(hist) hist.outerHTML=stageHistLine();
+    var bestEl=document.getElementById('stageBest');
+    if(bestEl) bestEl.outerHTML=stageBestChip();
+    wireStageHist();
+  }
   function wireStageHist(){
-    document.querySelectorAll('#stageHist [data-hist]').forEach(function(el){
-      el.onclick=function(){
+    var root=document.getElementById('stageHist');
+    if(!root) return;
+    root.querySelectorAll('[data-hist-del]').forEach(function(el){
+      el.onclick=function(ev){
+        if(ev && ev.stopPropagation) ev.stopPropagation();
+        var i=+el.getAttribute('data-hist-del');
+        var h=delStageHist(i);
+        var out=document.getElementById('stageOut');
+        if(out) out.textContent='기록 지움 · 로컬 '+((h&&h.length)||0)+'/7 · 컴프 0 · 확률 불변';
+        refreshStageHistUi();
+        try{legionTrack('stage_hist_del',{i:i})}catch(e){}
+      };
+    });
+    root.querySelectorAll('[data-hist]').forEach(function(el){
+      el.onclick=function(ev){
+        if(ev && ev.target && ev.target.closest && ev.target.closest('[data-hist-del]')) return;
         var i=+el.getAttribute('data-hist');
         var h=loadStageHist();
         var x=h[i];
         if(!x) return;
-        document.querySelectorAll('#stageHist [data-hist]').forEach(function(c){
+        root.querySelectorAll('[data-hist]').forEach(function(c){
           c.style.outline=(c===el)?'1px solid var(--gold)':'none';
         });
         paintStageReplay(x);
