@@ -156,6 +156,10 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     try{ localStorage.setItem('idol_stage_hist', JSON.stringify(h.slice(0,7))); }catch(e){}
     return h;
   }
+  function clearStageHistAll(){
+    try{ localStorage.setItem('idol_stage_hist','[]'); }catch(e){}
+    return [];
+  }
   function stageHistLine(){
     var h=loadStageHist();
     if(!h.length) return '<p id="stageHist" class="sub" style="margin:8px 0 0">무대 기록 없음 · 로컬 7</p>';
@@ -163,6 +167,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
       +h.map(function(x,i){
         return '<span class="chip" data-hist="'+i+'" role="button" tabindex="0" style="cursor:pointer">'+(x&&x.s)+' <span data-hist-del="'+i+'" aria-label="기록 지우기" style="opacity:.55;margin-left:2px">×</span></span>';
       }).join('')
+      +' <button type="button" class="sec" id="histClear" style="padding:2px 8px;font-size:11px;margin-left:4px">기록 전체 지우기</button>'
       +'</div>';
   }
   function paintStageReplay(x){
@@ -183,6 +188,16 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
   function wireStageHist(){
     var root=document.getElementById('stageHist');
     if(!root) return;
+    var clr=document.getElementById('histClear');
+    if(clr) clr.onclick=function(ev){
+      if(ev && ev.stopPropagation) ev.stopPropagation();
+      if(!confirm('무대 기록 전부 지울까?')) return;
+      clearStageHistAll();
+      var out=document.getElementById('stageOut');
+      if(out) out.textContent='기록 전체 지움 · 로컬 0/7 · 컴프 0 · 확률 불변';
+      refreshStageHistUi();
+      try{legionTrack('stage_hist_clear',{})}catch(e){}
+    };
     root.querySelectorAll('[data-hist-del]').forEach(function(el){
       el.onclick=function(ev){
         if(ev && ev.stopPropagation) ev.stopPropagation();
