@@ -214,14 +214,35 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     if(!copied) return '';
     return '복사 확인 · '+(+n||0)+'행 · 컴프 0 · 확률 불변';
   }
+  var HIST_CSV_COPY_OK_HIDE_MS=3000;
+  var histCsvCopyOkHideTimer=null;
+  function histCsvCopyOkHideMs(){ return HIST_CSV_COPY_OK_HIDE_MS; }
+  function hideHistCsvCopyOk(){
+    histCsvCopyOkHideTimer=null;
+    var el=document.getElementById('histCsvCopyOk');
+    if(!el) return false;
+    el.textContent='';
+    el.setAttribute('data-ok','0');
+    el.setAttribute('hidden','');
+    return true;
+  }
+  function armHistCsvCopyOkHide(){
+    if(histCsvCopyOkHideTimer){ clearTimeout(histCsvCopyOkHideTimer); histCsvCopyOkHideTimer=null; }
+    histCsvCopyOkHideTimer=setTimeout(hideHistCsvCopyOk, HIST_CSV_COPY_OK_HIDE_MS);
+  }
   function paintHistCsvCopyOk(n, copied){
     var el=document.getElementById('histCsvCopyOk');
     if(!el) return '';
     var line=histCsvCopyOkLine(n, copied);
     el.textContent=line;
     el.setAttribute('data-ok', copied?'1':'0');
-    if(line) el.removeAttribute('hidden');
-    else el.setAttribute('hidden','');
+    if(line){
+      el.removeAttribute('hidden');
+      armHistCsvCopyOkHide();
+    }else{
+      el.setAttribute('hidden','');
+      if(histCsvCopyOkHideTimer){ clearTimeout(histCsvCopyOkHideTimer); histCsvCopyOkHideTimer=null; }
+    }
     return line;
   }
   function applyStageHistCsvCopy(from){
