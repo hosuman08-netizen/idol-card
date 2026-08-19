@@ -288,6 +288,19 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     }
     return true;
   }
+  /* WAVE208: 재시작 중 탭=링 끄기 · 재시작과 분리 · 컴프 0 · 확률 불변 */
+  function killHistCsvFocusRing(){
+    histCsvRingTok++;
+    var el=typeof document!=='undefined'?document.getElementById('histCsv'):null;
+    if(el && el._ringT) try{clearTimeout(el._ringT);}catch(e0){}
+    clearHistCsvFocusRing();
+    if(el && el.setAttribute){
+      el.setAttribute('data-ring-off','1');
+      el.setAttribute('data-ring-tap','1');
+    }
+    holdHistCsvBtnFocus();
+    return true;
+  }
   /* WAVE157: 확인줄 탭=즉시숨김 · 컴프 0 · 확률 불변 */
   function bindHistCsvCopyOkTap(){
     var el=typeof document!=='undefined'?document.getElementById('histCsvCopyOk'):null;
@@ -418,6 +431,7 @@ try{if(!sessionStorage.getItem('lw_p37_idol_car_session_counter')){sessionStorag
     var csvBtn=document.getElementById('histCsv');
     if(csvBtn) csvBtn.onclick=function(ev){
       if(ev && ev.stopPropagation) ev.stopPropagation();
+      if(histCsvFocusRingOn(csvBtn)){ killHistCsvFocusRing(); return; }
       if(restartHistCsvRingFromFocus()) return;
       var csv=downloadStageHistCsv();
       var n=(loadStageHist()||[]).length;
